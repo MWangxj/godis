@@ -150,6 +150,38 @@ func HGetAll(key string, v *map[string]string) error {
 	return nil
 }
 
+func SAdd(key string, v interface{}) error {
+	if pool == nil {
+		return errors.New("please dial redis server first.")
+	}
+	data, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	conn := pool.Get()
+	defer conn.Close()
+	if _, err = conn.Do("SADD", formatKey(key), data); err != nil {
+		return err
+	}
+	return nil
+}
+
+func SMembers(key string, v []string) error {
+	if pool == nil {
+		return errors.New("please dial redis server first.")
+	}
+	if reflect.TypeOf(v).Kind() != reflect.Ptr {
+		return errors.New("param2 is not a pointer")
+	}
+	conn := pool.Get()
+	defer conn.Close()
+	var err error
+	if v, err = redis.Strings(conn.Do("SMEMBERS", formatKey(key))); err != nil {
+		return err
+	}
+	return nil
+}
+
 func arr2map(arr []string) (*map[string]string, error) {
 	if len(arr)%2 != 0 {
 		return nil, errors.New("array length is not right")
