@@ -75,6 +75,18 @@ func Get(key string, v interface{}) error {
 	return json.Unmarshal(data, v)
 }
 
+func Del(key string) error {
+	if pool == nil {
+		return errors.New("please dial redis server first.")
+	}
+	conn := pool.Get()
+	defer conn.Close()
+	if _, err := conn.Do("DEL", formatKey(key)); err != nil {
+		return err
+	}
+	return nil
+}
+
 func HSet(key, region string, v interface{}) error {
 	if pool == nil {
 		return errors.New("please dial redis server first.")
@@ -86,6 +98,18 @@ func HSet(key, region string, v interface{}) error {
 	conn := pool.Get()
 	defer conn.Close()
 	if _, err = conn.Do("HSET", formatKey(key), region, data); err != nil {
+		return err
+	}
+	return nil
+}
+
+func HDel(key, region string) error {
+	if pool == nil {
+		return errors.New("please dial redis server first.")
+	}
+	conn := pool.Get()
+	defer conn.Close()
+	if _, err := conn.Do("HDEL", formatKey(key), region); err != nil {
 		return err
 	}
 	return nil
