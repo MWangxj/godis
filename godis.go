@@ -13,14 +13,17 @@ var (
 	pool                 *redis.Pool
 )
 
+// SetKeyPrefix 设置key前缀
 func SetKeyPrefix(prefix string) {
 	keyPrefix = prefix
 }
 
+// SetKeySubfix 设置key后缀
 func SetKeySubfix(subfix string) {
 	keySubfix = subfix
 }
 
+// Dail 拨号
 func Dail(addr, passwd string, maxidle, maxac, db int, to time.Duration) *redis.Pool {
 	pool = &redis.Pool{
 		MaxIdle:     maxidle,
@@ -43,6 +46,7 @@ func Dail(addr, passwd string, maxidle, maxac, db int, to time.Duration) *redis.
 	return pool
 }
 
+// Set 调用redis set 命令
 func Set(key string, v interface{}) error {
 	if pool == nil {
 		return errors.New("please dial redis server first.")
@@ -59,6 +63,7 @@ func Set(key string, v interface{}) error {
 	return nil
 }
 
+// Get 调用redis get 命令
 func Get(key string, v interface{}) error {
 	if pool == nil {
 		return errors.New("please dail redis server first.")
@@ -75,6 +80,7 @@ func Get(key string, v interface{}) error {
 	return json.Unmarshal(data, v)
 }
 
+// Del 调用redis del 命令
 func Del(key string) error {
 	if pool == nil {
 		return errors.New("please dial redis server first.")
@@ -87,6 +93,7 @@ func Del(key string) error {
 	return nil
 }
 
+// HSet 调用redis hset 设置哈希数据结构
 func HSet(key, region string, v interface{}) error {
 	if pool == nil {
 		return errors.New("please dial redis server first.")
@@ -103,6 +110,7 @@ func HSet(key, region string, v interface{}) error {
 	return nil
 }
 
+// HDel 删除哈希数据结构中的一个region
 func HDel(key, region string) error {
 	if pool == nil {
 		return errors.New("please dial redis server first.")
@@ -115,6 +123,7 @@ func HDel(key, region string) error {
 	return nil
 }
 
+// HGet 获取哈希数据结构一个region的值
 func HGet(key, region string, v interface{}) error {
 	if pool == nil {
 		return errors.New("please dial redis server first.")
@@ -131,6 +140,7 @@ func HGet(key, region string, v interface{}) error {
 	return json.Unmarshal(data, v)
 }
 
+// HGetAll 获取该key下面所有哈希的集合，值以字符串表示
 func HGetAll(key string, v *map[string]string) error {
 	if pool == nil {
 		return errors.New("please dial redis server first.")
@@ -150,6 +160,7 @@ func HGetAll(key string, v *map[string]string) error {
 	return nil
 }
 
+// SAdd 向该key下面添加set散列
 func SAdd(key string, v interface{}) error {
 	if pool == nil {
 		return errors.New("please dial redis server first.")
@@ -166,6 +177,7 @@ func SAdd(key string, v interface{}) error {
 	return nil
 }
 
+// SMembers 获取该key下面 所有set集合
 func SMembers(key string, v []string) error {
 	if pool == nil {
 		return errors.New("please dial redis server first.")
