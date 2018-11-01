@@ -63,8 +63,38 @@ func Set(key string, v interface{}) error {
 	return nil
 }
 
-// Get 调用redis get 命令
-func Get(key string, v interface{}) error {
+// GetInt
+func GetInt(key string) (int, error) {
+	if pool == nil {
+		return 0, errors.New("please dail redis server first.")
+	}
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.Int(conn.Do("GET", formatKey(key)))
+}
+
+// GetString
+func GetString(key string) (string, error) {
+	if pool == nil {
+		return "", errors.New("please dail redis server first.")
+	}
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.String(conn.Do("GET", formatKey(key)))
+}
+
+// GetBool
+func GetBool(key string) (bool, error) {
+	if pool == nil {
+		return false, errors.New("please dail redis server first.")
+	}
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.Bool(conn.Do("GET", formatKey(key)))
+}
+
+// GetObj 调用redis get 命令
+func GetObj(key string, v interface{}) error {
 	if pool == nil {
 		return errors.New("please dail redis server first.")
 	}
