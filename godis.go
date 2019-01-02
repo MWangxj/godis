@@ -1,11 +1,11 @@
 package godis
 
 import (
-	`encoding/json`
-	`errors`
-	`github.com/garyburd/redigo/redis`
-	`reflect`
-	`time`
+	"encoding/json"
+	"errors"
+	"github.com/garyburd/redigo/redis"
+	"reflect"
+	"time"
 )
 
 var (
@@ -58,6 +58,18 @@ func Set(key string, v interface{}) error {
 	conn := pool.Get()
 	defer conn.Close()
 	if _, err = conn.Do("SET", formatKey(key), data); err != nil {
+		return err
+	}
+	return nil
+}
+
+func Expire(key string, ttl int) error {
+	if pool == nil {
+		return errors.New("please dial redis server first.")
+	}
+	conn := pool.Get()
+	defer conn.Close()
+	if _, err := conn.Do("EXPIRE", formatKey(key), ttl); err != nil {
 		return err
 	}
 	return nil
@@ -168,6 +180,28 @@ func HGet(key, region string, v interface{}) error {
 		return err
 	}
 	return json.Unmarshal(data, v)
+}
+
+func LPush(key string, v ...string) error {
+	if pool == nil {
+		return errors.New("please dial redis server first.")
+	}
+	conn := pool.Get()
+	defer conn.Close()
+	data, err := redis.Bytes(conn.Do("LPUSH", v))
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, v)
+}
+
+func LPop(key string) (string, error) {
+	if pool == nil {
+		return "", errors.New("please dial redis server first.")
+	}
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.String(conn.Do("LPOP", key))
 }
 
 // HGetAll 获取该key下面所有哈希的集合，值以字符串表示

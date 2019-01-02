@@ -1,9 +1,9 @@
 package godis
 
 import (
-	`github.com/garyburd/redigo/redis`
-	`testing`
-	`time`
+	"github.com/garyburd/redigo/redis"
+	"testing"
+	"time"
 )
 
 func dial() *redis.Pool {
@@ -19,8 +19,22 @@ func TestRedis(t *testing.T) {
 		t.Fail()
 		t.Log(err.Error())
 	}
-	var v int
-	if err := Get("wangxianjin", v); err != nil {
+	if _, err := GetInt("wangxianjin"); err != nil {
+		t.Fail()
+		t.Log(err.Error())
+	}
+}
+
+func TestExpire(t *testing.T) {
+	p := dial()
+
+	t.Log(p)
+
+	if err := Set("wangxianjin", 1); err != nil {
+		t.Fail()
+		t.Log(err.Error())
+	}
+	if err := Expire("wangxianjin", 60); err != nil {
 		t.Fail()
 		t.Log(err.Error())
 	}
